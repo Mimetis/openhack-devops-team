@@ -176,7 +176,7 @@ func TestTrip(t *testing.T) {
 	apiTestList[6].URL = strings.Replace(apiTestList[6].URL, "{tripID}", TripFromStr(apiTestList[3].ActualResponse).ID, 1)
 	apiTestList[6].URL = strings.Replace(apiTestList[6].URL, "{tripPointID}", TripPointFromStr(apiTestList[5].ActualResponse).ID, 1)
 	apiTestList[6].Body = GetUpdateTripPoint(apiTestList[5].ActualResponse, apiTestList[6].Body)
-	//apiTestList[6].ExpectedResponse = apiTestList[6].Body
+	apiTestList[6].ExpectedResponse = apiTestList[6].Body
 
 	// setup read trip points for trip test
 	apiTestList[7].URL = strings.Replace(apiTestList[7].URL, "{tripID}", TripFromStr(apiTestList[3].ActualResponse).ID, 1)
