@@ -9,7 +9,7 @@ pipeline {
         }
         stage('trips') {
             agent {
-                docker { image: 'golang:1.8' }
+                docker { image 'golang:1.8' }
             }
             steps {
                 sh 'cd apis/trips; go test ./test'
