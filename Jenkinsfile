@@ -8,8 +8,11 @@ pipeline {
             }
         }
         stage('trips') {
+            agent {
+                docker { image: 'golang:1.8' }
+            }
             steps {
-                echo 'trips'
+                sh 'cd apis/trips; go test ./test'
             }
         }
         stage('user-java') {
