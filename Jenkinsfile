@@ -135,13 +135,65 @@ pipeline {
                   }
              }
         }
-        stage('userprofile') {
+        stage('userprofile Tests run') {
             when {
                 changeset "apis/userprofile/**"
             }
+            agent {
+                docker {
+                    image 'node:8-alpine'
+                }
+            }
             steps {
-                echo 'userprofile'
+                  sh 'cd apis/userprofile/ && npm install && npm run test'
+
             }
          }
+         stage('user-java SonarQube Analysis') {
+             when {
+                  changeset "apis/user-java/**"
+             }
+
+             steps {
+                 sh """docker run --rm \
+                       --mount type=bind,source="${env.WORKSPACE}",target=/workspace \
+                       -w "/workspace/apis/userprofile" \
+                       newtmitch/sonar-scanner sonar-scanner \
+                       -Dsonar.projectKey=Mimetis_openhack-devops-team-userprofile \
+                       -Dsonar.organization=mimetis-github \
+                       -Dsonar.projectName=userprofile \
+                       -Dsonar.projectBaseDir=/workspace/apis/userprofile \
+                       -Dsonar.sources= \
+                       -Dsonar.host.url=https://sonarcloud.io \
+                       -Dsonar.login=dd77b51aa204d65dab0dd6d5f0ef7fbb4e6c23cd \
+                       -Dsonar.exclusions=**/node_modules/**/*,**/coverage/**/*,**/reports/**/* && sudo chown -R 1000:1000 "${env.WORKSPACE}/apis/userprofile" """
+
+                 sh """sleep 10 && curl -s -u dd77b51aa204d65dab0dd6d5f0ef7fbb4e6c23cd: \$(cat ./apis/userprofile/.scannerwork/report-task.txt | grep ceTaskUrl | cut -d'=' -f2,3) | grep SUCCESS"""
+             }
+         }
+         stage('userprofile build Image and Push') {
+              when {
+                  changeset "apis/userprofile/**"
+              }
+              steps {
+                   script {
+                         def img = docker.build("openhacks3n5acr.azurecr.io/devopsoh/api-user:${env.BUILD_ID}", "apis/userprofile")
+                         img.push()
+                   }
+              }
+         }
+         stage('update userprofile application') {
+             when {
+                allOf {
+                  changeset "apis/userprofile/**"
+                  branch 'master'
+                }
+             }
+             steps {
+                  script {
+                    sh 'helm upgrade api-user $WORKSPACE/apis/userprofile/helm --set repository.image=openhacks3n5acr.azurecr.io/devopsoh/api-user,repository.tag=$BUILD_ID,env.webServerBaseUri="http://akstraefikopenhacks3n5.westeurope.cloudapp.azure.com",ingress.rules.endpoint.host=akstraefikopenhacks3n5.westeurope.cloudapp.azure.com'
+                  }
+             }
+        }
     }
 }
