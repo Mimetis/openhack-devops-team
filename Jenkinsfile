@@ -138,7 +138,7 @@ pipeline {
 
             }
          }
-         stage('user-java SonarQube Analysis') {
+         stage('userprofile SonarQube Analysis') {
              when {
                   changeset "apis/user-java/**"
              }
