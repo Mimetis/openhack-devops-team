@@ -206,7 +206,8 @@ pipeline {
   //           }
              steps {
                   script {
-                    sh '''active=$(cat /home/jenkins/helm_values_stored/userprofile | grep active= | cut -d= -f2);
+                    sh '''#!/bin/bash
+                          active=$(cat /home/jenkins/helm_values_stored/userprofile | grep active= | cut -d= -f2);
                           if [[ "$active" == "blue" ]]; then
                             echo "blue is active"
                             green=$BUILD_ID
