@@ -5,8 +5,9 @@ pipeline {
         }
     }
 
+//Tests run and sonaQube part
     stages {
-        stage('poi tests run') {
+        stage('poi Tests run') {
             when {
                 changeset "apis/poi/**"
             }
@@ -20,27 +21,7 @@ pipeline {
                   sh 'cd apis/poi && dotnet test tests/UnitTests/UnitTests.csproj'
             }
         }
-        stage('poi build docker image and push') {
-            when {
-                changeset "apis/poi/**"
-            }
-            steps {
-                sh 'docker build -t openhacks3n5acr.azurecr.io/devopsoh/api-poi:$BUILD_ID apis/poi/web && docker push openhacks3n5acr.azurecr.io/devopsoh/api-poi:$BUILD_ID'
-            }
-        }
-        stage('poi helm') {
-             when {
-                allOf {
-                  changeset "apis/poi/**"
-                  branch 'master'
-                }
-             }
-             steps {
-                  script {
-                    sh 'helm upgrade api-poi $WORKSPACE/apis/poi/helm --set repository.image=openhacks3n5acr.azurecr.io/devopsoh/api-poi,repository.tag=$BUILD_ID,env.webServerBaseUri="http://akstraefikopenhacks3n5.westeurope.cloudapp.azure.com",ingress.rules.endpoint.host=akstraefikopenhacks3n5.westeurope.cloudapp.azure.com'
-                  }
-             }
-        }
+
         stage('trips Tests run') {
             when {
                 changeset "apis/trips/**"
@@ -56,28 +37,7 @@ pipeline {
 
             }
         }
-        stage('trips build Image and Push') {
-             when {
-                 changeset "apis/trips/**"
-             }
-             steps {
-                        sh 'docker build -t openhacks3n5acr.azurecr.io/devopsoh/api-trip:$BUILD_ID apis/trips && docker push openhacks3n5acr.azurecr.io/devopsoh/api-trip:$BUILD_ID'
 
-             }
-        }
-        stage('update helm application') {
-             when {
-                allOf {
-                  changeset "apis/trips/**"
-                  branch 'master'
-                }
-             }
-             steps {
-                  script {
-                    sh 'helm upgrade api-trip $WORKSPACE/apis/trips/helm --set repository.image=openhacks3n5acr.azurecr.io/devopsoh/api-trip,repository.tag=$BUILD_ID,env.webServerBaseUri="http://akstraefikopenhacks3n5.westeurope.cloudapp.azure.com",ingress.rules.endpoint.host=akstraefikopenhacks3n5.westeurope.cloudapp.azure.com'
-                  }
-             }
-        }
         stage('user-java Tests Run') {
             when {
                 changeset "apis/user-java/**"
@@ -101,8 +61,8 @@ pipeline {
 
                 }
              }
-
         }
+
         stage('user-java SonarQube Analysis') {
             when {
                  changeset "apis/user-java/**"
@@ -125,30 +85,6 @@ pipeline {
 
                 sh """sleep 10 && curl -s -u dd77b51aa204d65dab0dd6d5f0ef7fbb4e6c23cd: \$(cat ./apis/user-java/.scannerwork/report-task.txt | grep ceTaskUrl | cut -d'=' -f2,3) | grep SUCCESS"""
             }
-        }
-        stage('user-java build Image and Push') {
-             when {
-                 changeset "apis/user-java/**"
-             }
-             steps {
-                  script {
-                        def img = docker.build("openhacks3n5acr.azurecr.io/devopsoh/api-user-java:${env.BUILD_ID}", "apis/user-java")
-                        img.push()
-                  }
-             }
-        }
-        stage('update helm user-java') {
-             when {
-                allOf {
-                  changeset "apis/user-java/**"
-                  branch 'master'
-                }
-             }
-             steps {
-                  script {
-                    sh 'helm upgrade api-user-java $WORKSPACE/apis/user-java/helm --set repository.image=openhacks3n5acr.azurecr.io/devopsoh/api-user-java,repository.tag=$BUILD_ID,env.webServerBaseUri="http://akstraefikopenhacks3n5.westeurope.cloudapp.azure.com",ingress.rules.endpoint.host=akstraefikopenhacks3n5.westeurope.cloudapp.azure.com'
-                  }
-             }
         }
         stage('userprofile Tests run') {
             when {
@@ -186,6 +122,40 @@ pipeline {
                  sh """sleep 10 && curl -s -u dd77b51aa204d65dab0dd6d5f0ef7fbb4e6c23cd: \$(cat ./apis/userprofile/.scannerwork/report-task.txt | grep ceTaskUrl | cut -d'=' -f2,3) | grep SUCCESS"""
              }
          }
+
+
+//Docker images Build and Push
+
+        stage('poi build docker image and push') {
+            when {
+                changeset "apis/poi/**"
+            }
+            steps {
+                sh 'docker build -t openhacks3n5acr.azurecr.io/devopsoh/api-poi:$BUILD_ID apis/poi/web && docker push openhacks3n5acr.azurecr.io/devopsoh/api-poi:$BUILD_ID'
+            }
+        }
+
+        stage('trips build Image and Push') {
+             when {
+                 changeset "apis/trips/**"
+             }
+             steps {
+                        sh 'docker build -t openhacks3n5acr.azurecr.io/devopsoh/api-trip:$BUILD_ID apis/trips && docker push openhacks3n5acr.azurecr.io/devopsoh/api-trip:$BUILD_ID'
+
+             }
+        }
+        stage('user-java build Image and Push') {
+             when {
+                 changeset "apis/user-java/**"
+             }
+             steps {
+                  script {
+                        def img = docker.build("openhacks3n5acr.azurecr.io/devopsoh/api-user-java:${env.BUILD_ID}", "apis/user-java")
+                        img.push()
+                  }
+             }
+        }
+
          stage('userprofile build Image and Push') {
               when {
                   changeset "apis/userprofile/**"
@@ -197,7 +167,52 @@ pipeline {
                    }
               }
          }
-         stage('update userprofile application') {
+
+
+//Helm upgrade part
+
+        stage('poi helm upgrade') {
+             when {
+                allOf {
+                  changeset "apis/poi/**"
+                  branch 'master'
+                }
+             }
+             steps {
+                  script {
+                    sh 'helm upgrade api-poi $WORKSPACE/apis/poi/helm --set repository.image=openhacks3n5acr.azurecr.io/devopsoh/api-poi,repository.tag=$BUILD_ID,env.webServerBaseUri="http://akstraefikopenhacks3n5.westeurope.cloudapp.azure.com",ingress.rules.endpoint.host=akstraefikopenhacks3n5.westeurope.cloudapp.azure.com'
+                  }
+             }
+        }
+
+        stage('trips helm upgrade') {
+             when {
+                allOf {
+                  changeset "apis/trips/**"
+                  branch 'master'
+                }
+             }
+             steps {
+                  script {
+                    sh 'helm upgrade api-trip $WORKSPACE/apis/trips/helm --set repository.image=openhacks3n5acr.azurecr.io/devopsoh/api-trip,repository.tag=$BUILD_ID,env.webServerBaseUri="http://akstraefikopenhacks3n5.westeurope.cloudapp.azure.com",ingress.rules.endpoint.host=akstraefikopenhacks3n5.westeurope.cloudapp.azure.com'
+                  }
+             }
+        }
+        stage('user-java helm upgrade') {
+             when {
+                allOf {
+                  changeset "apis/user-java/**"
+                  branch 'master'
+                }
+             }
+             steps {
+                  script {
+                    sh 'helm upgrade api-user-java $WORKSPACE/apis/user-java/helm --set repository.image=openhacks3n5acr.azurecr.io/devopsoh/api-user-java,repository.tag=$BUILD_ID,env.webServerBaseUri="http://akstraefikopenhacks3n5.westeurope.cloudapp.azure.com",ingress.rules.endpoint.host=akstraefikopenhacks3n5.westeurope.cloudapp.azure.com'
+                  }
+             }
+        }
+
+         stage('userprofile helm upgrade') {
              when {
                 allOf {
                   changeset "apis/userprofile/**"
