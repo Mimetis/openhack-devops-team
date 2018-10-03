@@ -131,7 +131,7 @@ pipeline {
              }
              steps {
                   script {
-                    sh 'helm upgrade api-user $WORKSPACE/apis/user-java/helm --set repository.image=openhacks3n5acr.azurecr.io/devopsoh/api-user,repository.tag=$BUILD_ID,env.webServerBaseUri="http://akstraefikopenhacks3n5.westeurope.cloudapp.azure.com",ingress.rules.endpoint.host=akstraefikopenhacks3n5.westeurope.cloudapp.azure.com'
+                    sh 'helm upgrade api-user-java $WORKSPACE/apis/user-java/helm --set repository.image=openhacks3n5acr.azurecr.io/devopsoh/api-user,repository.tag=$BUILD_ID,env.webServerBaseUri="http://akstraefikopenhacks3n5.westeurope.cloudapp.azure.com",ingress.rules.endpoint.host=akstraefikopenhacks3n5.westeurope.cloudapp.azure.com'
                   }
              }
         }
