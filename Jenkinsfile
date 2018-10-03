@@ -140,7 +140,7 @@ pipeline {
          }
          stage('userprofile SonarQube Analysis') {
              when {
-                  changeset "apis/user-java/**"
+                  changeset "apis/userprofile/**"
              }
 
              steps {
