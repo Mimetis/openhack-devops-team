@@ -25,10 +25,10 @@ Test('/healthcheck/user', function (t) {
         t.error(err, 'No parse error');
         t.ok(api, 'Valid swagger api');
         /**
-         * summary: 
+         * summary:
          * description: Returns healthcheck for systems looking to ensure API is up and operational
-         * parameters: 
-         * produces: 
+         * parameters:
+         * produces:
          * responses: 200, default
          */
         t.test('test  get operation', function (t) {
@@ -61,7 +61,7 @@ Test('/healthcheck/user', function (t) {
                 }
                 request.end(function (err, res) {
                     t.error(err, 'No error');
-                    t.ok(res.statusCode === 200, 'Ok response status');
+                    t.ok(res.statusCode === 500, 'Ok response status');
                     var Validator = require('is-my-json-valid');
                     var validate = Validator(api.paths['/healthcheck/user']['get']['responses']['200']['schema']);
                     var response = res.body;
