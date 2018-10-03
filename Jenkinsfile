@@ -30,7 +30,7 @@ pipeline {
                 docker { image 'maven:3-alpine' }
             }
             steps {
-                sh 'mvn test'
+                sh 'mvn -f apis/user-java/pom.xml test'
             }
 
         }
