@@ -43,6 +43,7 @@ pipeline {
                         def img = docker.build("openhacks3n5acr.azurecr.io/devopsoh/api-user-java:${env.BUILD_ID}", "apis/user-java")
                         img.push()
                   }
+             }
         }
         stage('userprofile') {
             when {
