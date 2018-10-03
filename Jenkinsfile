@@ -56,7 +56,6 @@ pipeline {
             when {
                 changeset "apis/user-java/**"
             }
-
             agent {
                 docker { image 'maven:3-alpine' }
             }
@@ -65,13 +64,7 @@ pipeline {
             }
 
             post {
-
                 always {
-                    script {
-                            properties([[$class: 'GithubProjectProperty',
-                                        projectUrlStr: 'https://github.com/Mimetis/openhack-devops-team']])
-                    }
-
                     junit '**/target/*-reports/TEST-*.xml'
                     step([$class: 'JacocoPublisher',
                           execPattern: 'apis/user-java/target/*.exec',
@@ -79,10 +72,6 @@ pipeline {
                           sourcePattern: 'apis/user-java/src/main/java',
                           exclusionPattern: 'apis/user-java/src/test*'
                     ])
-                    step([$class: 'GitHubIssueNotifier',
-                          issueAppend: true,
-                          issueLabel: '',
-                          issueTitle: '$JOB_NAME $BUILD_DISPLAY_NAME failed'])
 
                 }
              }
@@ -194,6 +183,20 @@ pipeline {
                     sh 'helm upgrade api-user $WORKSPACE/apis/userprofile/helm --set repository.image=openhacks3n5acr.azurecr.io/devopsoh/api-user,repository.tag=$BUILD_ID,env.webServerBaseUri="http://akstraefikopenhacks3n5.westeurope.cloudapp.azure.com",ingress.rules.endpoint.host=akstraefikopenhacks3n5.westeurope.cloudapp.azure.com'
                   }
              }
+        }
+    }
+
+    post {
+
+        failure {
+            script {
+                    properties([[$class: 'GithubProjectProperty',
+                                projectUrlStr: 'https://github.com/Mimetis/openhack-devops-team']])
+            }
+            step([$class: 'GitHubIssueNotifier',
+                  issueAppend: true,
+                  issueLabel: '',
+                  issueTitle: '$JOB_NAME $BUILD_DISPLAY_NAME failed'])
         }
     }
 }
