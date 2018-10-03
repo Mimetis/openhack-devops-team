@@ -207,10 +207,12 @@ pipeline {
              steps {
                   script {
                     sh '''active=$(cat /home/jenkins/helm_values_stored/userprofile | grep active= | cut -d= -f2);
-                          if [ "$active" == "blue" ]; then
+                          if [[ "$active" == "blue" ]]; then
+                            echo "blue is active"
                             green=$BUILD_ID
                             blue=$(cat /home/jenkins/helm_values_stored/userprofile | grep blue= | cut -d= -f2);
                           else
+                            echo "green is active"
                             blue=$BUILD_ID
                             green=$(cat /home/jenkins/helm_values_stored/userprofile | grep green= | cut -d= -f2);
                           fi
