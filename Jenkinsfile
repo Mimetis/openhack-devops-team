@@ -126,7 +126,7 @@ pipeline {
              when {
                 allOf {
                   changeset "apis/user-java/**"
-                 // branch 'master'
+                  branch 'master'
                 }
              }
              steps {
