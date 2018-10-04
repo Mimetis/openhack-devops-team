@@ -15,6 +15,9 @@ metadata:
     {{- range $key, $value := .Values.ingress.annotations }}
       {{ $key }}: {{ $value | quote }}
     {{- end }}
+    traefik.ingress.kubernetes.io/service-weights: |
+      {{ $path.serviceName }}-blue: {{ .Values.ingress.percentage_blue}}
+      {{ $path.serviceName }}-green: {{ .Values.ingress.percentage_green}}
 spec:
   rules:
     {{- range $key, $value := .Values.ingress.rules }}
@@ -24,7 +27,11 @@ spec:
         {{- range $path := .paths }}
           - path: {{ $path.path }}
             backend:
-              serviceName: {{ $path.serviceName }}
+              serviceName: {{ $path.serviceName }}-blue
+              servicePort: {{ $path.servicePort }}
+          - path: {{ $path.path }}
+            backend:
+              serviceName: {{ $path.serviceName }}-green
               servicePort: {{ $path.servicePort }}
         {{- end -}}
     {{- end -}}
