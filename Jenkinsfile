@@ -152,7 +152,10 @@ pipeline {
         }
         stage('userprofile Tests run') {
             when {
-                changeset "apis/userprofile/**"
+                allOf {
+                  changeset "apis/userprofile/**"
+                  branch 'does-not-exists'
+                }
             }
             agent {
                 docker {
@@ -166,7 +169,10 @@ pipeline {
          }
          stage('userprofile SonarQube Analysis') {
              when {
-                  changeset "apis/userprofile/**"
+               allOf {
+                 changeset "apis/userprofile/**"
+                 branch 'does-not-exists'
+               }
              }
 
              steps {
