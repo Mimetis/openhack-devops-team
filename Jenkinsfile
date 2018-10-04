@@ -187,9 +187,9 @@ pipeline {
              }
          }
          stage('userprofile build Image and Push') {
-  //            when {
-  //                changeset "apis/userprofile/**"
-  //            }
+              when {
+                  changeset "apis/userprofile/**"
+              }
               steps {
                    script {
                          def img = docker.build("openhacks3n5acr.azurecr.io/devopsoh/api-user:${env.BUILD_ID}", "apis/userprofile")
@@ -198,12 +198,12 @@ pipeline {
               }
          }
          stage('update userprofile application') {
-  //           when {
-  //              allOf {
-  //                changeset "apis/userprofile/**"
-  //                branch 'master'
-  //              }
-  //           }
+             when {
+                allOf {
+                  changeset "apis/userprofile/**"
+                  branch 'master'
+                }
+             }
              steps {
                   script {
                     sh '''#!/bin/bash
