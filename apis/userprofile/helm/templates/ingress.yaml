@@ -16,8 +16,8 @@ metadata:
       {{ $key }}: {{ $value | quote }}
     {{- end }}
     traefik.ingress.kubernetes.io/service-weights: |
-      {{ $path.serviceName }}-blue: {{ .Values.ingress.percentage_blue}}
-      {{ $path.serviceName }}-green: {{ .Values.ingress.percentage_green}}
+      api-user-svc-green: {{ .Values.ingress.percentage_green }}
+      api-user-svc-blue: {{ .Values.ingress.percentage_blue }}
 spec:
   rules:
     {{- range $key, $value := .Values.ingress.rules }}

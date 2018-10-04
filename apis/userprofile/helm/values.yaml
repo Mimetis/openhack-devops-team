@@ -18,8 +18,8 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: traefik
-  percentage_blue: 100%
-  percentage_green: 0%
+  percentage_blue: 100
+  percentage_green: 0
   rules:
     endpoint:
       host: changeme
