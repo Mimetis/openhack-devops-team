@@ -223,11 +223,15 @@ pipeline {
                             blue=$BUILD_ID
                             green=$(cat /home/jenkins/helm_values_stored/userprofile | grep green= | cut -d= -f2);
                           fi
+                          percentage_green=$(cat /home/jenkins/helm_values_stored/userprofile | grep percentage_g= | cut -d= -f2);
+                          percentage_blue=$(cat /home/jenkins/helm_values_stored/userprofile | grep percentage_b= | cut -d= -f2);
                       helm upgrade api-user $WORKSPACE/apis/userprofile/helm --set repository.image=openhacks3n5acr.azurecr.io/devopsoh/api-user,repository.tag=$BUILD_ID,repository.tag_green=$green,repository.tag_blue=$blue,active_version=$active,env.webServerBaseUri="http://akstraefikopenhacks3n5.westeurope.cloudapp.azure.com",ingress.rules.endpoint.host=akstraefikopenhacks3n5.westeurope.cloudapp.azure.com
                       cat << EOF > /home/jenkins/helm_values_stored/userprofile
 active=$active
 blue=$blue
 green=$green
+percentage_b=$percentage_blue
+percentage_g=$percentage_green
 EOF
                     '''
                   }
